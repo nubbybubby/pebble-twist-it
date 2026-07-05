@@ -1,0 +1,102 @@
+{
+  "name": "Twist It!",
+  "author": "nubbybubby",
+  "version": "1.0.0",
+  "keywords": ["pebble-app"],
+  "private": true,
+  "dependencies": {},
+  "pebble": {
+    "displayName": "Twist It!",
+    "uuid": "bec63170-efd1-41f7-a879-453580cf953e",
+    "sdkVersion": "3",
+    "enableMultiJS": true,
+    "targetPlatforms": [
+      "emery",
+      "flint"
+    ],
+    "watchapp": {
+      "watchface": false
+    },
+    "messageKeys": [
+      "dummy"
+    ],
+    "resources": {
+      "media": [
+        {
+          "type": "raw",
+          "name": "PCM_DATA_BLITZ",
+          "file": "audio/blitz.raw"
+        },
+        {
+          "type": "raw",
+          "name": "PCM_DATA_SFX_BOP",
+          "file": "audio/sfx/sfx_bop.raw"
+        },
+        {
+          "type": "raw",
+          "name": "PCM_DATA_SFX_TWIST",
+          "file": "audio/sfx/sfx_twist.raw"
+        },
+        {
+          "type": "raw",
+          "name": "PCM_DATA_SFX_PULL",
+          "file": "audio/sfx/sfx_pull.raw"
+        },
+        {
+          "type": "raw",
+          "name": "PCM_DATA_BOP_IT",
+          "file": "audio/voice/bopit.raw"
+        },
+        {
+          "type": "raw",
+          "name": "PCM_DATA_TWIST_IT",
+          "file": "audio/voice/twistit.raw"
+        },
+        {
+          "type": "raw",
+          "name": "PCM_DATA_PULL_IT",
+          "file": "audio/voice/pullit.raw"
+        },
+        {
+          "type": "raw",
+          "name": "PCM_DATA_DIE",
+          "file": "audio/voice/die.raw"
+        },
+        {
+          "type": "raw",
+          "name": "PCM_DATA_WIN_1",
+          "file": "audio/voice/win_1.raw"
+        },
+        {
+          "type": "raw",
+          "name": "PCM_DATA_WIN_2",
+          "file": "audio/voice/win_2.raw"
+        },
+        {
+          "type": "raw",
+          "name": "PCM_DATA_WIN_3",
+          "file": "audio/voice/win_3.raw"
+        },
+        {
+          "type": "bitmap",
+          "name": "IMAGE_ICON",
+          "file": "images/icon.png",
+          "menuIcon": true
+        },
+        {
+          "type": "bitmap",
+          "name": "IMAGE_BOP_IT_BW",
+          "file": "images/bopit_bw.png",
+          "memoryFormat": "1Bit",
+          "targetPlatforms": [ "flint" ]
+        },
+        {
+          "type": "bitmap",
+          "name": "IMAGE_BOP_IT_COLOR",
+          "file": "images/bopit_color.png",
+          "targetPlatforms": [ "emery" ]
+        }
+      ]
+    }
+  }
+}
