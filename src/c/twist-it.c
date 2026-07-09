@@ -151,8 +151,12 @@ static void bopit_callback(void) {
     return;
   }
 
-  called_action = rand() / ((RAND_MAX + 1u) / 3);
-
+  if (score < 3) {
+    called_action = score;
+  } else {
+    called_action = rand() / ((RAND_MAX + 1u) / 3);
+  }
+  
   if (called_action != TWIST_IT) {
     lock_accel = true;
   } else {
