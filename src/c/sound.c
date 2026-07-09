@@ -24,6 +24,7 @@ static float blitz_speed;
 
 static uint8_t s_buffer_1[SAMPLES_PER_CHUNK];
 static uint8_t s_buffer_2[SAMPLES_PER_CHUNK];
+static uint32_t written;
 
 static bool track_2_active;
 static bool track_1_active;
@@ -65,7 +66,7 @@ static void speaker_write_callback(void *data) {
   }
 
   if (track_1_active || track_2_active) {
-    speaker_stream_write(final_buffer, SAMPLES_PER_CHUNK);
+    written = speaker_stream_write(final_buffer, SAMPLES_PER_CHUNK);
   }
   
   speaker_write_timer = app_timer_register(TIMER_MS, speaker_write_callback, NULL);
@@ -76,12 +77,10 @@ static void blitz_loop_callback(void *data) {
 
   size_t remaining = blitz_size - blitz_offset;
 
-  size_t to_read_track_1 = (remaining < BYTES_PER_CHUNK) ? remaining : BYTES_PER_CHUNK;
-
   if (remaining > 0) {
     track_1_active = true;
-    resource_load_byte_range(blitz_handle, blitz_offset, s_buffer_1, to_read_track_1);
-    blitz_offset += to_read_track_1 * blitz_speed;
+    resource_load_byte_range(blitz_handle, blitz_offset, s_buffer_1, written);
+    blitz_offset += written * blitz_speed;
     track_1_timer = app_timer_register(TIMER_MS, blitz_loop_callback, NULL);
   }
 
@@ -99,10 +98,17 @@ static void blitz_loop_callback(void *data) {
     enable_timeout = false;
   }
 
-  if (blitz_offset >= blitz_size) {
+  if (blitz_offset > blitz_size) {
     has_called_bopit_cb = false;
     enable_timeout = true;
     blitz_offset = 0;
+  }
+}
+
+static void cancel_track_2_timer(void) {
+  if (track_2_timer != NULL) {
+    app_timer_cancel(track_2_timer);
+    track_2_timer = NULL;
   }
 }
 
@@ -111,17 +117,17 @@ static void track_2_callback(void *data) {
 
   size_t remaining = current_vsfx_size - vsfx_offset;
 
-  size_t to_read_track_2 = (remaining < BYTES_PER_CHUNK) ? remaining : BYTES_PER_CHUNK;
-
-  if (remaining > BYTES_PER_CHUNK / 2) {
+  if (remaining > 0) {
     track_2_active = true;
-    resource_load_byte_range(current_vsfx_handle, vsfx_offset, s_buffer_2, to_read_track_2);
-    vsfx_offset += to_read_track_2;
+    resource_load_byte_range(current_vsfx_handle, vsfx_offset, s_buffer_2, written);
+    vsfx_offset += written;
     track_2_timer = app_timer_register(TIMER_MS, track_2_callback, NULL);
-  } else {
+  }
+
+  if (vsfx_offset > current_vsfx_size) {
+    cancel_track_2_timer();
     track_2_active = false;
     vsfx_offset = 0;
-    return;
   }
 }
 
@@ -149,10 +155,7 @@ void start_voice_sfx(sound_type type, int index) {
     break;
   }
   
-  if (track_2_timer != NULL) {
-    app_timer_cancel(track_2_timer);
-    track_2_timer = NULL;
-  }
+  cancel_track_2_timer();
 
   if (track_2_timer == NULL) {
     vsfx_offset = 0;
