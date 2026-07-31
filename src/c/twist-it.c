@@ -172,16 +172,12 @@ static void bopit_action(int action) {
 
   if (score >= MAX_SCORE) return;
 
-  size_t vsfx_offset = *get_vsfx_offset();
   size_t blitz_offset = *get_blitz_offset();
    
-  if (said_action && vsfx_offset != 0) {
+  if (said_action && *get_vsfx_offset() != 0) {
     game_over();
     return;
-  } else if (blitz_offset < blitz_size - 800 && blitz_offset > TIMEOUT_OFFSET) {
-    game_over();
-    return;
-  }
+  } 
 
   if (said_action && action == called_action) {
 
