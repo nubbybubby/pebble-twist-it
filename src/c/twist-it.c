@@ -16,6 +16,8 @@
 
 #define SWIPE_THRESHOLD 16
 
+static WatchInfoVersion fw;
+
 static Window *s_window;
 static TextLayer *score_text_layer;
 static TextLayer *high_score_text_layer;
@@ -97,6 +99,22 @@ static void update_score() {
   text_layer_set_text(high_score_text_layer, high_score_buffer);
 }
 
+static bool emery_430_or_greater(void) {
+  #if defined(PBL_PLATFORM_FLINT)
+
+  return false;
+
+  #elif defined(PBL_PLATFORM_EMERY)
+
+  if (fw.major >= 4 && fw.minor >= 30) {
+    return true;
+  }
+
+  return false;
+
+  #endif
+}
+
 static void end_game() {
   stop_blitz_loop();
   user_action = 0;
@@ -118,7 +136,7 @@ static void start_game() {
   game_running = true;
   game_speed = 1.0;
   score = 0;
-  speaker_set_volume(volume);
+  speaker_set_volume(emery_430_or_greater() ? (volume * 2) : volume);
   start_blitz_loop();
 }
 
@@ -310,7 +328,7 @@ static void prv_up_click_handler(ClickRecognizerRef recognizer, void *context) {
  
   if (volume >= MAX_VOLUME || game_running || lock_controls) return;
   volume = volume + 2;
-  speaker_set_volume(volume);
+  speaker_set_volume(emery_430_or_greater() ? (volume * 2) : volume);
 }
 
 static void prv_down_click_handler(ClickRecognizerRef recognizer, void *context) {
@@ -318,7 +336,7 @@ static void prv_down_click_handler(ClickRecognizerRef recognizer, void *context)
 
   if (volume <= MIN_VOLUME || game_running || lock_controls) return;
   volume = volume - 2;
-  speaker_set_volume(volume);
+  speaker_set_volume(emery_430_or_greater() ? (volume * 2) : volume);
 }
 
 static void prv_click_config_provider(void *context) {
@@ -350,7 +368,7 @@ static void prv_window_load(Window *window) {
   text_layer_set_text_alignment(high_score_text_layer, GTextAlignmentCenter);
   layer_add_child(window_layer, text_layer_get_layer(high_score_text_layer));
   
-  if (!start_stream(volume)) {
+  if (!start_stream(emery_430_or_greater() ? (volume * 2) : volume)) {
     text_layer_set_overflow_mode(score_text_layer, GTextOverflowModeWordWrap);
     text_layer_set_text(score_text_layer, "Failed to open speaker stream!");
     layer_set_hidden(text_layer_get_layer(score_text_layer), false);
@@ -358,7 +376,7 @@ static void prv_window_load(Window *window) {
     lock_controls = true;
   }
 
-  speaker_set_volume(volume);
+  speaker_set_volume(emery_430_or_greater() ? (volume * 2) : volume);
 }
 
 static void prv_window_unload(Window *window) {
@@ -408,6 +426,8 @@ static void prv_init(void) {
 
   const bool animated = true;
  
+  fw = watch_info_get_firmware_version();
+
   accel_service_set_sampling_rate(ACCEL_SAMPLE_RATE);
   accel_service_set_samples_per_update(ACCEL_SAMPLES_PER_UPDATE);
   accel_data_service_subscribe(ACCEL_SAMPLES_PER_UPDATE, accel_data_handler);
