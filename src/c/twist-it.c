@@ -189,8 +189,6 @@ static void bopit_action(int action) {
   if (!game_running || lock_controls) return;
 
   if (score >= MAX_SCORE) return;
-
-  size_t blitz_offset = *get_blitz_offset();
    
   if (said_action && *get_vsfx_offset() != 0) {
     game_over();
